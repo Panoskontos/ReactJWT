@@ -10,9 +10,9 @@ import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import SignUpPage from './pages/SignUpPage';
+import PrivateRoute from './privateRoute';
 
-// ----------------------------------------------------------------------
-
+// ------------------------------------------- 
 export default function Router() {
   const routes = useRoutes([
     {
@@ -20,10 +20,25 @@ export default function Router() {
       element: <DashboardLayout />,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element: <DashboardAppPage /> },
-        { path: 'user', element: <UserPage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
+        { path: 'app', element:<PrivateRoute>
+          <DashboardAppPage />
+        </PrivateRoute>  
+           },
+        { path: 'user', element: 
+        <PrivateRoute>
+          <UserPage />
+        </PrivateRoute>
+       },
+        { path: 'products', element:
+        <PrivateRoute>    
+          <ProductsPage />
+        </PrivateRoute>
+       },
+        { path: 'blog', element:
+      <PrivateRoute>
+        <BlogPage />
+      </PrivateRoute>  
+       },
       ],
     },
     {

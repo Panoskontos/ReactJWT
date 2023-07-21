@@ -41,6 +41,10 @@ export default function AccountPopover() {
     dispatch(logout())
     navigate("/")
   };
+  
+  const handleClosePopover = () =>{
+    setOpen(null)
+  }
 
   return (
     <>
@@ -67,7 +71,7 @@ export default function AccountPopover() {
       <Popover
         open={Boolean(open)}
         anchorEl={open}
-        onClose={handleClose}
+        onClose={handleClosePopover}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
@@ -96,7 +100,7 @@ export default function AccountPopover() {
 
         <Stack sx={{ p: 1 }}>
           {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
+            <MenuItem key={option.label}>
               {option.label}
             </MenuItem>
           ))}

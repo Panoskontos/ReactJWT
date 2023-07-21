@@ -5,7 +5,7 @@ import { Navigate, useRoutes, Outlet } from 'react-router-dom';
 // Private Route
 function PrivateRoute({ children }) {
   const { userInfo } = useSelector((state) => state.auth); // replace with your actual selector
-  return userInfo ? <Outlet/> : <Navigate to="/login" replace />;
+  return userInfo ? children : <Navigate to="/login" replace />;
 }
 
 export default PrivateRoute;

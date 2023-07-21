@@ -72,7 +72,7 @@ export default function SignUpPage() {
 
         <Container maxWidth="sm">
           <StyledContent>
-            <Typography variant="h4" gutterBottom>
+            <Typography style={{display:"flex", justifyContent:"center", marginBottom:30}}  variant="h4" gutterBottom>
               Sign up
             </Typography>  
 

@@ -29,7 +29,7 @@ export default function ShopProductCard({ product }) {
 
   return (
     <Card>
-      <Box sx={{ pt: '100%', position: 'relative' }}>
+      <Box sx={{ pt: '100%', position: 'relative', cursor:"pointer" }}>
         {status && (
           <Label
             variant="filled"
@@ -56,7 +56,8 @@ export default function ShopProductCard({ product }) {
         </Link>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={colors} />
+            <>Some info </>
+          {/* <ColorPreview colors={colors} /> */}
           <Typography variant="subtitle1">
             <Typography
               component="span"
@@ -66,10 +67,10 @@ export default function ShopProductCard({ product }) {
                 textDecoration: 'line-through',
               }}
             >
-              {priceSale && fCurrency(priceSale)}
+              {/* {priceSale&&`${price}€`} */}
             </Typography>
             &nbsp;
-            {fCurrency(price)}
+                      {price}€/month
           </Typography>
         </Stack>
       </Stack>

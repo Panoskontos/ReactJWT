@@ -27,7 +27,7 @@ export default function Router() {
           <UserPage />
         </PrivateRoute>
        },
-        { path: 'products', element:
+        { path: 'cars', element:
         <PrivateRoute>    
           <ProductsPage />
         </PrivateRoute>

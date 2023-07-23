@@ -178,6 +178,8 @@ const handleChoseSort = (e) => {
         <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
           <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
             <ProductFilterSidebar
+              products={products}
+              setProducts={setProducts}
               openFilter={openFilter}
               onOpenFilter={handleOpenFilter}
               onCloseFilter={handleCloseFilter}
@@ -218,7 +220,7 @@ const handleChoseSort = (e) => {
         </Stack>
 
         <ProductList products={products} />
-        <ProductCartWidget />
+        {/* <ProductCartWidget /> */}
       </Container>
     </>
   );

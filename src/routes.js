@@ -11,6 +11,7 @@ import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import SignUpPage from './pages/SignUpPage';
 import PrivateRoute from './privateRoute';
+import Product from './pages/Product.tsx'
 
 // ------------------------------------------- 
 export default function Router() {
@@ -30,6 +31,11 @@ export default function Router() {
         { path: 'cars', element:
         <PrivateRoute>    
           <ProductsPage />
+        </PrivateRoute>
+       },
+        { path: 'car', element:
+        <PrivateRoute>    
+          <Product />
         </PrivateRoute>
        },
         { path: 'blog', element:

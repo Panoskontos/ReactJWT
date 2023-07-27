@@ -6,6 +6,9 @@ import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
+// import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -13,6 +16,7 @@ const style = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: "50%",
+    height:"300px",
     bgcolor: 'background.paper',
     borderRadius:"10px",
     // border: '2px solid #000',
@@ -23,11 +27,26 @@ const style = {
 
 const Product: React.FC = () => {
 
+    const excludedDate1 = new Date(Date.UTC(2023, 8, 1));
+const timestamp = excludedDate1.getTime();
+const excludedDate2 = new Date(Date.UTC(2023, 9, 1));
+const timestamp2 = excludedDate2.getTime();
+
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const x = 6
+    const [startDate, setStartDate] = useState(new Date("2023/08/08"));
+    const [endDate, setEndDate] = useState(new Date("2023/08/09"));
+    const filterPassedTime = (time) => {
+        const currentDate = new Date();
+        const selectedDate = new Date(time);
+    
+        return currentDate.getTime() < selectedDate.getTime();
+      };
+
+
+
 
     return (
         <div>
@@ -39,12 +58,47 @@ const Product: React.FC = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
+            <Box sx={{display:"flex", justifyContent:"center"}}>
+
+          <Typography sx={{mb:3}} id="modal-modal-title" variant="h6" component="h2">
+            Pick Start and End Month
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
+            </Box>
+
+        <Box sx={{display:"flex", justifyContent:"center"}}>
+          <DatePicker
+        selected={startDate}
+        onChange={(date: React.SetStateAction<Date>) => setStartDate(date)}
+        selectsStart
+        startDate={startDate}
+        endDate={endDate}
+        dateFormat="MM/yyyy"
+        showMonthYearPicker
+        excludeDates={[excludedDate1,excludedDate2
+          ]}
+     
+      />
+      <DatePicker
+        selected={endDate}
+        onChange={(date: React.SetStateAction<Date>) => setEndDate(date)}
+        selectsEnd
+        startDate={startDate}
+        endDate={endDate}
+        dateFormat="MM/yyyy"
+        showMonthYearPicker
+
+        excludeDates={[
+           excludedDate1, excludedDate2
+          ]}
+      />
+
+
+           </Box>
+           <Box sx={{mt:4,  height:"100%", display:"flex", alignItems:"center" }}>
+           <Button 
+    sx={{width:"100%", height:50}} 
+     variant="contained" >Book Now</Button>
+           </Box>
         </Box>
       </Modal>
 

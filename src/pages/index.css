@@ -1,0 +1,68 @@
+.detailBox{
+    /* background-color: black; */
+    width: 500px;
+}
+
+.mychip{
+  background-color: #4888e0;
+  color: white;
+}
+
+.detailBox2{
+  /* background-color: black; */
+  width: 500px;
+  background-color: #edeff1;
+}
+
+.detailBoxParent{
+    /* background-color: black; */
+   display: flex;
+   justify-content: flex-end;
+}
+
+.detailBoxParent2{
+ display: flex;
+ justify-content: flex-start;
+}
+
+/* Mobile devices */
+@media screen and (max-width: 480px) {
+  /* Your CSS rules for mobile devices here */
+  .detailBox{
+    /* background-color: black; */
+    width: 300px;
+}
+
+.detailBox2{
+  /* background-color: black; */
+  width: 300px;
+}
+
+.detailBoxParent{
+    /* background-color: black; */
+   display: flex;
+   justify-content: center;
+}
+
+.detailBoxParent2{
+  /* background-color: black; */
+ display: flex;
+ justify-content: center;
+}
+
+}
+
+/* Tablets and small devices */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  /* Your CSS rules for tablets and small devices here */
+}
+
+/* Medium-sized devices */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  /* Your CSS rules for medium-sized devices here */
+}
+
+/* Large devices */
+@media screen and (min-width: 1025px) {
+  /* Your CSS rules for large devices here */
+}

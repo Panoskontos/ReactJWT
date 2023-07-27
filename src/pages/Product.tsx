@@ -27,23 +27,69 @@ const style = {
 
 const Product: React.FC = () => {
 
+    function calculateMonthsBetween(date1:any, date2:any) {
+        // Ensure date1 is before date2
+        if (date1 > date2) {
+            [date1, date2] = [date2, date1];
+        }
+    
+        let years = date2.getFullYear() - date1.getFullYear();
+        let months = date2.getMonth() - date1.getMonth();
+        const days = date2.getDate() - date1.getDate();
+    
+        // Decrease year by 1 if date2's month is less than date1's month
+        if (months < 0 || (months === 0 && days < 0)) {
+            years-=1;
+            months += 12;
+        }
+    
+        // If date2's day is less than date1's day, decrease months by 1
+        if (days < 0) {
+            months-=1;
+        }
+    
+        const monthsBetween = years * 12 + months;
+    
+        return monthsBetween;
+    }
+
+
+    
+
     const excludedDate1 = new Date(Date.UTC(2023, 8, 1));
 const timestamp = excludedDate1.getTime();
 const excludedDate2 = new Date(Date.UTC(2023, 9, 1));
 const timestamp2 = excludedDate2.getTime();
+const excludedArray = [
+    excludedDate1, excludedDate2
+   ]
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    const [price, setPrice] = useState(400)
+
     const [startDate, setStartDate] = useState(new Date("2023/08/08"));
     const [endDate, setEndDate] = useState(new Date("2023/08/09"));
-    const filterPassedTime = (time) => {
+    const filterPassedTime = (time:any) => {
         const currentDate = new Date();
         const selectedDate = new Date(time);
-    
         return currentDate.getTime() < selectedDate.getTime();
-      };
+    };
+    
+
+        const handleBookDates:any = ()=>{
+            console.log("hey")
+            const months = calculateMonthsBetween(startDate, endDate)
+            console.log(months)
+            if(months===0){
+                console.log(1)
+            }else{
+                console.log(months+1-excludedArray.length)
+            }
+        }
+
 
 
 
@@ -60,8 +106,10 @@ const timestamp2 = excludedDate2.getTime();
         <Box sx={style}>
             <Box sx={{display:"flex", justifyContent:"center"}}>
 
-          <Typography sx={{mb:3}} id="modal-modal-title" variant="h6" component="h2">
-            Pick Start and End Month
+          <Typography 
+       
+          sx={{mb:3}} id="modal-modal-title" variant="h6" component="h2">
+            Choose Start and End Month
           </Typography>
             </Box>
 
@@ -74,8 +122,7 @@ const timestamp2 = excludedDate2.getTime();
         endDate={endDate}
         dateFormat="MM/yyyy"
         showMonthYearPicker
-        excludeDates={[excludedDate1,excludedDate2
-          ]}
+        excludeDates={excludedArray}
      
       />
       <DatePicker
@@ -87,17 +134,16 @@ const timestamp2 = excludedDate2.getTime();
         dateFormat="MM/yyyy"
         showMonthYearPicker
 
-        excludeDates={[
-           excludedDate1, excludedDate2
-          ]}
+        excludeDates={excludedArray}
       />
 
 
            </Box>
            <Box sx={{mt:4,  height:"100%", display:"flex", alignItems:"center" }}>
            <Button 
+              onClick={()=>handleBookDates()}
     sx={{width:"100%", height:50}} 
-     variant="contained" >Book Now</Button>
+     variant="contained" >Book Months</Button>
            </Box>
         </Box>
       </Modal>

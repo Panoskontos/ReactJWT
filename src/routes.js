@@ -33,7 +33,9 @@ export default function Router() {
           <ProductsPage />
         </PrivateRoute>
        },
-        { path: 'car', element:
+        { 
+          path: 'car',
+         element:
         <PrivateRoute>    
           <Product />
         </PrivateRoute>

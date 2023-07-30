@@ -6,6 +6,9 @@ import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
+// import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
 // import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -26,6 +29,22 @@ const style = {
 
 
 const Product: React.FC = () => {
+    const location = useLocation();
+
+    const { n, p, c, s } = location.state;
+
+    const excludedDate1 = new Date(Date.UTC(2023, 8, 1));
+    const timestamp = excludedDate1.getTime();
+    const excludedDate2 = new Date(Date.UTC(2023, 9, 1));
+    const timestamp2 = excludedDate2.getTime();
+
+
+    const [excludedArray, setExcludedArray] = useState(
+        [
+            excludedDate1, excludedDate2
+           ]
+    )
+
 
     function calculateMonthsBetween(date1:any, date2:any) {
         // Ensure date1 is before date2
@@ -53,22 +72,34 @@ const Product: React.FC = () => {
         return monthsBetween;
     }
 
+    function getFirstDays(start:any, end:any) {
+        const startDate1 = new Date(start);
+        const endDate1 = new Date(end);
+        
+        
+        const current = startDate1;
+        current.setDate(1);
+      
+        const firstDays = [];
+      
+        while (current <= endDate1) {
+          firstDays.push(new Date(current));
+          current.setMonth(current.getMonth() + 1);
+        }
+      
+        return firstDays;
+      }
+
 
     
 
-    const excludedDate1 = new Date(Date.UTC(2023, 8, 1));
-const timestamp = excludedDate1.getTime();
-const excludedDate2 = new Date(Date.UTC(2023, 9, 1));
-const timestamp2 = excludedDate2.getTime();
-const excludedArray = [
-    excludedDate1, excludedDate2
-   ]
+ 
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const [price, setPrice] = useState(400)
+    // const [price, setPrice] = useState(400)
 
     const [startDate, setStartDate] = useState(new Date("2023/08/08"));
     const [endDate, setEndDate] = useState(new Date("2023/08/09"));
@@ -80,14 +111,23 @@ const excludedArray = [
     
 
         const handleBookDates:any = ()=>{
-            console.log("hey")
+            // console.log("hey")
             const months = calculateMonthsBetween(startDate, endDate)
             console.log(months)
+           
+            const firstDays = getFirstDays(startDate, endDate)
+            console.log(firstDays)
+
+            
+
             if(months===0){
                 console.log(1)
             }else{
                 console.log(months+1-excludedArray.length)
             }
+
+
+            setExcludedArray(firstDays)
         }
 
 
@@ -161,7 +201,7 @@ const excludedArray = [
                             height: 500,
                             backgroundColor: 'primary.dark',
                             borderRadius:"10px",
-                            backgroundImage: `url('/assets/images/products/product_1.jpg')`, // Added this line
+                            backgroundImage: `url('${c}')`, // Added this line
                             backgroundSize: 'cover', // Make sure image covers the box
                             backgroundPosition: 'center', // Center the image
                                }} 
@@ -187,13 +227,13 @@ const excludedArray = [
                     }}
                     >
 <Box>
-<Chip className='mychip' label="NEW" />
+<Chip className='mychip' label={s!==""?s:"Available"} />
 </Box>
 <Box sx={{mt:2,mb:2, display:"flex", justifyContent:"center"}}>
-   <Typography variant="h6" >BMW M4</Typography>
+   <Typography variant="h6" >{n}</Typography>
 </Box>
 <Box sx={{mt:4,mb:2, display:"flex", justifyContent:"center"}} >
-<Typography variant="h4" >400€ / Month</Typography>
+<Typography variant="h4" >{p}€ / Month</Typography>
 </Box>
 <Box>
     <Typography variant="body1">

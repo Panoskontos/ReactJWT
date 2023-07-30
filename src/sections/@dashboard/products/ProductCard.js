@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 // @mui
 import { Box, Card, Link, Typography, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 // utils
 import { fCurrency } from '../../../utils/formatNumber';
 // components
 import Label from '../../../components/label';
 import { ColorPreview } from '../../../components/color-utils';
-
 // ----------------------------------------------------------------------
 
 const StyledProductImg = styled('img')({
@@ -26,10 +26,19 @@ ShopProductCard.propTypes = {
 
 export default function ShopProductCard({ product }) {
   const { name, cover, price, colors, status, priceSale } = product;
+  const navigate = useNavigate()
+  const GotoProduct = (name, cover, price, status) =>{
+    // console.log(name,price,cover)
+    navigate(`/dashboard/car`, { state: { n: name, p: price, c:cover, s:status }} )
+  }
 
   return (
     <Card>
-      <Box sx={{ pt: '100%', position: 'relative', cursor:"pointer" }}>
+      <Box sx={{ pt: '100%', position: 'relative', cursor:"pointer",
+    
+    }}
+    onClick={()=>GotoProduct(name,cover,price,status)}
+    >
         {status && (
           <Label
             variant="filled"

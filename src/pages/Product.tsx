@@ -12,6 +12,9 @@ import { useLocation } from 'react-router-dom';
 // import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -119,15 +122,21 @@ const Product: React.FC = () => {
             console.log(firstDays)
 
             
-
+            let bmonths 
             if(months===0){
                 console.log(1)
+                bmonths=1
             }else{
                 console.log(months+1-excludedArray.length)
+                bmonths=months+2-excludedArray.length
             }
 
+            toast.success(`You have successfully booked ${n} for ${bmonths} months !`, {
+                position: toast.POSITION.TOP_CENTER
+              });
 
             setExcludedArray(firstDays)
+       
         }
 
 
@@ -227,7 +236,7 @@ const Product: React.FC = () => {
                     }}
                     >
 <Box>
-<Chip className='mychip' label={s!==""?s:"Available"} />
+<Chip className='mychip' label={s!==""?s:"AVAILABLE"} />
 </Box>
 <Box sx={{mt:2,mb:2, display:"flex", justifyContent:"center"}}>
    <Typography variant="h6" >{n}</Typography>

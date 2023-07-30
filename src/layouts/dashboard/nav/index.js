@@ -8,6 +8,7 @@ import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/mater
 import { UseSelector, useDispatch, useSelector } from 'react-redux';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
+import { setAvatar } from '../../../slices/authSlice';
 import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
@@ -39,7 +40,8 @@ const style = {
   transform: 'translate(-50%, -50%)',
   width: 400,
   bgcolor: 'background.paper',
-  border: '2px solid #000',
+  borderRadius:5,
+  // border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -54,6 +56,7 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
+  const dispatch = useDispatch();
 
   const { userInfo } = useSelector((state)=>state.auth)
 
@@ -61,6 +64,12 @@ export default function Nav({ openNav, onCloseNav }) {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const [avatarName,setAvatarName] = useState("panos")
+
+  const handleAvatarChange = (newAvatar) => {
+    dispatch(setAvatar(newAvatar));
+    handleClose()
+  };
 
   // navbar------------------------------------------
 const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
@@ -138,26 +147,30 @@ if (!userInfo?.token) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
+          <Box sx={{display:"flex", justifyContent:"center"}}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            You can change your avatar here
+            You can change your avatar here using random words
           </Typography>
+          </Box>
         <Box sx={{mt:3,display:"flex", justifyContent:"center", alignItems:"center"}}>
         <Avatar 
        
         sx={{cursor:"pointer",
         width: 56, height: 56
-        }}  src={"https://api.multiavatar.com/2.png"} alt="photoURL" />
+        }}  src={`https://api.multiavatar.com/${avatarName}.png`} alt="photoURL" />
         </Box>
 
         <Box sx={{mt:4,display:"flex", justifyContent:"center"}}>
         <TextField  
         id="standard-basic" 
-        label="Type Avatar Name" 
+        label="Type to Change" 
+        
+        onChange={(e)=>setAvatarName(e.target.value)}
         variant="standard" />
         </Box>
 
         <Box sx={{mt:4,display:"flex", justifyContent:"center"}}>
-          <Button variant="contained" color="info" >Save</Button>
+          <Button onClick={()=>handleAvatarChange(avatarName)}  variant="contained" color="info" >Save</Button>
         </Box>
         </Box>
       </Modal>
@@ -165,7 +178,7 @@ if (!userInfo?.token) {
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            <Avatar onClick={handleOpen} sx={{cursor:"pointer"}}  src={account.photoURL1} alt="photoURL" />
+            <Avatar onClick={handleOpen} sx={{cursor:"pointer"}}  src={userInfo.user_avatar?`https://api.multiavatar.com/${userInfo.user_avatar}.png` :account.photoURL} alt="photoURL" />
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>

@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
 // mock
 import { UseSelector, useDispatch, useSelector } from 'react-redux';
+import Modal from '@mui/material/Modal';
+import TextField from '@mui/material/TextField';
 import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
@@ -15,6 +17,7 @@ import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
 import SvgColor from '../../../components/svg-color';
+
 // import navConfig from './config';
 // ----------------------------------------------------------------------
 
@@ -28,6 +31,20 @@ const StyledAccount = styled('div')(({ theme }) => ({
   backgroundColor: alpha(theme.palette.grey[500], 0.12),
 }));
 
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
+
 // ----------------------------------------------------------------------
 
 Nav.propTypes = {
@@ -39,6 +56,11 @@ export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
 
   const { userInfo } = useSelector((state)=>state.auth)
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
 
   // navbar------------------------------------------
 const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
@@ -96,6 +118,9 @@ if (!userInfo?.token) {
   }, [pathname]);
 
   const renderContent = (
+
+
+    
     <Scrollbar
       sx={{
         height: 1,
@@ -106,10 +131,41 @@ if (!userInfo?.token) {
         <Logo />
       </Box>
 
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            You can change your avatar here
+          </Typography>
+        <Box sx={{mt:3,display:"flex", justifyContent:"center", alignItems:"center"}}>
+        <Avatar 
+       
+        sx={{cursor:"pointer",
+        width: 56, height: 56
+        }}  src={"https://api.multiavatar.com/2.png"} alt="photoURL" />
+        </Box>
+
+        <Box sx={{mt:4,display:"flex", justifyContent:"center"}}>
+        <TextField  
+        id="standard-basic" 
+        label="Type Avatar Name" 
+        variant="standard" />
+        </Box>
+
+        <Box sx={{mt:4,display:"flex", justifyContent:"center"}}>
+          <Button variant="contained" color="info" >Save</Button>
+        </Box>
+        </Box>
+      </Modal>
+
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            <Avatar src={account.photoURL} alt="photoURL" />
+            <Avatar onClick={handleOpen} sx={{cursor:"pointer"}}  src={account.photoURL1} alt="photoURL" />
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>

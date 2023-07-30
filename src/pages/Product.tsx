@@ -41,6 +41,8 @@ const Product: React.FC = () => {
     const excludedDate2 = new Date(Date.UTC(2023, 9, 1));
     const timestamp2 = excludedDate2.getTime();
 
+    const [finalPrice, setFinalPrice] = useState(0)
+    const [finalBookedMonths,setFinalBookedMonths ] = useState(0)
 
     const [excludedArray, setExcludedArray] = useState(
         [
@@ -93,6 +95,13 @@ const Product: React.FC = () => {
         return firstDays;
       }
 
+      const handlePayNow = ()=>{
+        toast.success(`You have successfully booked ${n} for ${finalBookedMonths} months !`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        setFinalBookedMonths(0)
+      }
+
 
     
 
@@ -131,10 +140,7 @@ const Product: React.FC = () => {
                 bmonths=months+2-excludedArray.length
             }
 
-            toast.success(`You have successfully booked ${n} for ${bmonths} months !`, {
-                position: toast.POSITION.TOP_CENTER
-              });
-
+            setFinalBookedMonths(bmonths)
             setExcludedArray(firstDays)
        
         }
@@ -186,13 +192,24 @@ const Product: React.FC = () => {
         excludeDates={excludedArray}
       />
 
-
            </Box>
-           <Box sx={{mt:4,  height:"100%", display:"flex", alignItems:"center" }}>
+           <Box sx={{mt:4,  height:"100%", display:"flex", alignItems:"center", flexDirection:"column" }}>
+<Box sx={{mt:2}}>
+Price: {p*finalBookedMonths} €
+</Box>
+
+{finalBookedMonths!==0?<>
+    <Button 
+              onClick={()=>handlePayNow()}
+    sx={{width:"100%", height:50, mt:2}} 
+    color='success'  variant="contained" >Pay Now</Button>
+</>
+:
            <Button 
-              onClick={()=>handleBookDates()}
-    sx={{width:"100%", height:50}} 
-     variant="contained" >Book Months</Button>
+           onClick={()=>handleBookDates()}
+           sx={{width:"100%", height:50, mt:2}} 
+           variant="contained" > Choose Months and Calculate Price</Button>
+        }
            </Box>
         </Box>
       </Modal>

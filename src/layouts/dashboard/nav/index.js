@@ -64,7 +64,7 @@ export default function Nav({ openNav, onCloseNav }) {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const [avatarName,setAvatarName] = useState("panos")
+  const [avatarName,setAvatarName] = useState(userInfo.user_avatar)
 
   const handleAvatarChange = (newAvatar) => {
     dispatch(setAvatar(newAvatar));
@@ -79,11 +79,7 @@ const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ 
     path: '/dashboard/app',
     icon: icon('ic_analytics'),
   },
-  {
-    title: 'user',
-    path: '/dashboard/user',
-    icon: icon('ic_user'),
-  },
+
   {
     title: 'Cars',
     path: '/dashboard/cars',
@@ -100,6 +96,16 @@ const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ 
   //   icon: icon('ic_disabled'),
   // },
 ];
+
+if(userInfo?.role==="admin"){
+  navConfig.push(
+    {
+      title: 'Admin',
+      path: '/dashboard/user',
+      icon: icon('ic_user'),
+    },
+  )
+}
 
 if (!userInfo?.token) {
     navConfig.push(
@@ -170,7 +176,7 @@ if (!userInfo?.token) {
         </Box>
 
         <Box sx={{mt:4,display:"flex", justifyContent:"center"}}>
-          <Button onClick={()=>handleAvatarChange(avatarName)}  variant="contained" color="info" >Save</Button>
+          <Button onClick={()=>handleAvatarChange(avatarName)}  variant="contained" color="info" >Save Avatar</Button>
         </Box>
         </Box>
       </Modal>

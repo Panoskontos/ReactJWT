@@ -31,9 +31,9 @@ export default function AppNewsUpdate({ title, subheader, list, ...other }) {
       <Divider />
 
       <Box sx={{ p: 2, textAlign: 'right' }}>
-        <Button size="small" color="inherit" endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
+        {/* <Button size="small" color="inherit" endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
           View all
-        </Button>
+        </Button> */}
       </Box>
     </Card>
   );
@@ -43,27 +43,27 @@ export default function AppNewsUpdate({ title, subheader, list, ...other }) {
 
 NewsItem.propTypes = {
   news: PropTypes.shape({
-    description: PropTypes.string,
+    months: PropTypes.string,
     image: PropTypes.string,
     postedAt: PropTypes.instanceOf(Date),
-    title: PropTypes.string,
+    car: PropTypes.string,
   }),
 };
 
 function NewsItem({ news }) {
-  const { image, title, description, postedAt } = news;
+  const { image, car, months, postedAt } = news;
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
-      <Box component="img" alt={title} src={image} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />
+      <Box component="img" alt={car} src={image} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />
 
       <Box sx={{ minWidth: 240, flexGrow: 1 }}>
         <Link color="inherit" variant="subtitle2" underline="hover" noWrap>
-          {title}
+          {car}
         </Link>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-          {description}
+          {months}
         </Typography>
       </Box>
 

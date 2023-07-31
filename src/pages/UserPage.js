@@ -29,17 +29,37 @@ import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
-import USERLIST from '../_mock/user';
+// import USERLIST from '../_mock/user';
 
 // ----------------------------------------------------------------------
 
+const USERLIST = [{
+  id: "id1",
+  avatarUrl: `/assets/images/products/product_1.jpg`,
+  name: "M4",
+  months: "3 months",
+  brand:"BMW",
+  price: "100$",
+  status: "sale",
+},
+{
+  id: "id2",
+  avatarUrl: `/assets/images/products/product_2.jpg`,
+  name: "TTS",
+  months: "3 months",
+  brand:"AUDI",
+  price: "300$",
+  status: "sale",
+},
+];
+
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
+  { id: 'months', label: 'Months', alignRight: false },
+  { id: 'price', label: 'Price', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: '' },
+  { id: 'brand', label:"Brand", alignRight: false },
+  { id: 'role', label: 'Actions', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -155,10 +175,10 @@ export default function UserPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            Cars Collection
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New User
+            New Car
           </Button>
         </Stack>
 
@@ -179,7 +199,7 @@ export default function UserPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
+                    const { id, name, brand, status, months, avatarUrl, price } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
 
                     return (
@@ -197,15 +217,15 @@ export default function UserPage() {
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{company}</TableCell>
+                        <TableCell align="left">{months}</TableCell>
 
-                        <TableCell align="left">{role}</TableCell>
 
-                        <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
+                        <TableCell align="left">{price}</TableCell>
 
                         <TableCell align="left">
                           <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label>
                         </TableCell>
+                        <TableCell align="left">{brand}</TableCell>
 
                         <TableCell align="right">
                           <IconButton size="large" color="inherit" onClick={handleOpenMenu}>

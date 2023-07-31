@@ -65,7 +65,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar   src={userInfo.user_avatar?`https://api.multiavatar.com/${userInfo.user_avatar}.png` :account.photoURL}  alt="photoURL" />
+        <Avatar   src={userInfo?.user_avatar?`https://api.multiavatar.com/${userInfo.user_avatar}.png` :account.photoURL}  alt="photoURL" />
       </IconButton>
 
       <Popover

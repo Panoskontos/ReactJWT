@@ -18,6 +18,7 @@ export default function LoginForm() {
   const navigate = useNavigate();
 
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
 
@@ -36,7 +37,7 @@ export default function LoginForm() {
   const handleClick = async () => {
     console.log(username, password);
     try {
-      const res = await login({ username, password }).unwrap();
+      const res = await login({ username, email, password }).unwrap();
       dispatch(setCredentials({ ...res }));
       navigate('/');
     } catch (err) {

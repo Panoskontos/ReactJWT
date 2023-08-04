@@ -25,20 +25,19 @@ ShopProductCard.propTypes = {
 };
 
 export default function ShopProductCard({ product }) {
-  const { name, cover, price, colors, status, priceSale } = product;
-  const navigate = useNavigate()
-  const GotoProduct = (name, cover, price, status) =>{
-    // console.log(name,price,cover)
-    navigate(`/dashboard/car`, { state: { n: name, p: price, c:cover, s:status }} )
-  }
+  const { carId, brand, model, image, price, colors, status, priceSale } = product;
+  const navigate = useNavigate();
+  const GotoProduct = (carId, model, brand, image, price, status) => {
+    // console.log(model,price,image)
+    navigate(`/dashboard/car`, { state: { i: carId, n: model, b: brand, p: price, c: image, s: status } });
+  };
 
   return (
     <Card>
-      <Box sx={{ pt: '100%', position: 'relative', cursor:"pointer",
-    
-    }}
-    onClick={()=>GotoProduct(name,cover,price,status)}
-    >
+      <Box
+        sx={{ pt: '100%', position: 'relative', cursor: 'pointer' }}
+        onClick={() => GotoProduct(carId, model, brand, image, price, status)}
+      >
         {status && (
           <Label
             variant="filled"
@@ -54,18 +53,18 @@ export default function ShopProductCard({ product }) {
             {status}
           </Label>
         )}
-        <StyledProductImg alt={name} src={cover} />
+        <StyledProductImg alt={model} src={image} />
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>
         <Link color="inherit" underline="hover">
           <Typography variant="subtitle2" noWrap>
-            {name}
+            {brand} {model}
           </Typography>
         </Link>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <>Some info </>
+          <>Some info </>
           {/* <ColorPreview colors={colors} /> */}
           <Typography variant="subtitle1">
             <Typography
@@ -79,7 +78,7 @@ export default function ShopProductCard({ product }) {
               {/* {priceSale&&`${price}€`} */}
             </Typography>
             &nbsp;
-                      {price}€/month
+            {price}€/month
           </Typography>
         </Stack>
       </Stack>

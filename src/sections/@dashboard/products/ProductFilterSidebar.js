@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { faker } from '@faker-js/faker';
 import { sample } from 'lodash';
+import { useEffect } from 'react';
 // @mui
 import {
   Box,
@@ -18,10 +19,10 @@ import {
   FormControlLabel,
 } from '@mui/material';
 // components
+import axios from 'axios';
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import { ColorMultiPicker } from '../../../components/color-utils';
-
 // ----------------------------------------------------------------------
 
 export const SORT_BY_OPTIONS = [
@@ -31,107 +32,14 @@ export const SORT_BY_OPTIONS = [
   { value: 'priceAsc', label: 'Price: Low-High' },
 ];
 // export const FILTER_GENDER_OPTIONS = ['Men', 'Women', 'Kids'];
-export const FILTER_CATEGORY_OPTIONS = ['BMW','Audi','Tesla','Jeep','Honda', 'Range'];
+export const FILTER_CATEGORY_OPTIONS = ['BMW', 'Audi', 'Tesla', 'Jeep', 'Honda', 'Range'];
 export const FILTER_RATING_OPTIONS = ['up4Star', 'up3Star', 'up2Star', 'up1Star'];
 export const FILTER_PRICE_OPTIONS = [
   { value: 'below', label: 'Below 200€' },
   { value: 'between', label: 'Between 200€ - 500€' },
   { value: 'above', label: 'Above 500€' },
 ];
-export const FILTER_COLOR_OPTIONS = [
-  'red',
-  'black',
-  'white',
-  'blue',
-  'green',
-  '#1890FF',
-  '#94D82D',
-  '#FFC107',
-];
-
-const PRODUCT_NAME = [
-  'BMW M4',
-  'AUDI TTS',
-  'Range Rover',
-  'Jeep',
-  'Tesla Model S',
-  'Honda Civic',
-  'Nike Air Max Zephyr',
-  'Jordan Delta',
-  'Air Jordan XXXV PF',
-  'Nike Waffle Racer Crater',
-  'Kyrie 7 EP Sisterhood',
-  'Nike Air Zoom BB NXT',
-  'Nike Air Force 1 07 LX',
-  'Nike Air Force 1 Shadow SE',
-  'Nike Air Zoom Tempo NEXT%',
-  'Nike DBreak-Type',
-  'Nike Air Max Up',
-  'Nike Air Max 270 React ENG',
-  'NikeCourt Royale',
-  'Nike Air Zoom Pegasus 37 Premium',
-  'Nike Air Zoom SuperRep',
-  'NikeCourt Royale',
-  'Nike React Art3mis',
-  'Nike React Infinity Run Flyknit A.I.R. Chaz Bear',
-];
-
-const productsDummy = [
-  {
-    id: faker.datatype.uuid(),
-    cover:  `/assets/images/products/product_${1}.jpg`, 
-    name: PRODUCT_NAME[0],
-    price: 600,
-    color:"blue",
-    priceSale: 430,
-    status: sample(['sale', 'new', 'out', '']),
-  },
-    {
-    id: sample(['sale', 'new', 'out', '']),
-    cover:  `/assets/images/products/product_${2}.jpg`, 
-    name: PRODUCT_NAME[1],
-    price: 400,
-    color:"red",
-    priceSale: 430,
-    status: sample(['sale', 'new', 'out', '']),
-  },
-    {
-    id: sample(['sale', 'new', '', 'out']),
-    cover:  `/assets/images/products/product_${3}.jpg`, 
-    name: PRODUCT_NAME[2],
-    price: 550,
-    color:"black",
-    priceSale: 430,
-    status: sample(['sale', 'new', '', '']),
-  },
-    {
-    id: faker.datatype.uuid(),
-    cover:  `/assets/images/products/product_${4}.jpg`, 
-    name: PRODUCT_NAME[3],
-    color:"black",
-    price: 300,
-    priceSale: 430,
-    status: sample(['sale', 'new', '', '']),
-  },
-    {
-    id: faker.datatype.uuid(),
-    cover:  `/assets/images/products/product_${5}.jpg`, 
-    name: PRODUCT_NAME[4],
-    price: 500,
-    color:"white",
-    priceSale: 430,
-    status: sample(['sale', 'new', '', '']),
-  },
-    {
-    id: faker.datatype.uuid(),
-    cover:  `/assets/images/products/product_${6}.jpg`, 
-    name: PRODUCT_NAME[5],
-    price: 200,
-    color:"white",
-    priceSale: 430,
-    status: "out",
-  }
-] 
+export const FILTER_COLOR_OPTIONS = ['red', 'black', 'white', 'blue', 'green', '#1890FF', '#94D82D', '#FFC107'];
 
 // ----------------------------------------------------------------------
 
@@ -142,42 +50,70 @@ ShopFilterSidebar.propTypes = {
 };
 
 export default function ShopFilterSidebar({ openFilter, onOpenFilter, onCloseFilter, products, setProducts }) {
+  const handleChangeFilterBrand = (item) => {
+    // console.log(item)
 
-const handleChangeFilterBrand = (item) =>{
-  // console.log(item)
-  const filteredProducts = productsDummy.filter(product => product.name.toLowerCase().includes(item.toLowerCase()));
-  setProducts(filteredProducts)
+    const filteredProducts = products.filter((product) => product.brand.toLowerCase().includes(item.toLowerCase()));
+    setProducts(filteredProducts);
+  };
 
-}
+  const handleFilterColor = (item) => {
+    // console.log(item.target.value)
+    const color = item.target.value;
+    const filteredProducts = products.filter((product) => product.color.toLowerCase().includes(color.toLowerCase()));
+    setProducts(filteredProducts);
+  };
 
-const handleFilterColor = (item) =>{
-  // console.log(item.target.value)
-  const  color = item.target.value
-  const filteredProducts = productsDummy.filter(product => product.color.toLowerCase().includes(color.toLowerCase()));
-  setProducts(filteredProducts)
-}
+  const handleFilterPrice = (item) => {
+    console.log(item.value);
+    let filteredProducts;
+    if (item.value === 'below') {
+      filteredProducts = products.filter((product) => product.price <= 200);
+    }
+    if (item.value === 'between') {
+      filteredProducts = products.filter((product) => product.price > 200 && product.price <= 500);
+    }
+    if (item.value === 'above') {
+      filteredProducts = products.filter((product) => product.price > 500);
+    }
+    setProducts(filteredProducts);
 
-const handleFilterPrice = (item) =>{
-  console.log(item.value)
-  let filteredProducts
-  if(item.value==="below"){
-    filteredProducts = productsDummy.filter(product => product.price<=200);
-  }
-    if(item.value==="between"){
-    filteredProducts = productsDummy.filter(product => product.price>200&&product.price<=500);
-  }
-    if(item.value==="above"){
-    filteredProducts = productsDummy.filter(product => product.price>500);
-  }
-  setProducts(filteredProducts)
+    // const  color = item.target.value
+  };
 
-  // const  color = item.target.value
-}
+  const handleClearAll = () => {
+    fetchData();
+  };
 
-const handleClearAll = ()=>{
-  setProducts(productsDummy)
-}
+  // Function to fetch data from the endpoint
+  const fetchData = async () => {
+    try {
+      // Get the token from localStorage
+      const userInfoString = localStorage.getItem('userInfo');
+      if (!userInfoString) {
+        console.error('User info not found in localStorage');
+        return;
+      }
+      const userInfo = JSON.parse(userInfoString);
+      if (!userInfo || !userInfo.token) {
+        console.error('Invalid user info or missing token');
+        return;
+      }
+      const token = userInfo.token;
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
 
+      const response = await axios.get('https://localhost:7104/api/car/all', { headers });
+      setProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -223,7 +159,13 @@ const handleClearAll = ()=>{
               </Typography>
               <RadioGroup>
                 {FILTER_CATEGORY_OPTIONS.map((item) => (
-                  <FormControlLabel key={item} value={item} control={<Radio />} onClick={()=>handleChangeFilterBrand(item)}  label={item} />
+                  <FormControlLabel
+                    key={item}
+                    value={item}
+                    control={<Radio />}
+                    onClick={() => handleChangeFilterBrand(item)}
+                    label={item}
+                  />
                 ))}
               </RadioGroup>
             </div>
@@ -236,7 +178,7 @@ const handleClearAll = ()=>{
                 name="colors"
                 selected={[]}
                 colors={FILTER_COLOR_OPTIONS}
-                onClick={(color)=>handleFilterColor(color)}
+                onClick={(color) => handleFilterColor(color)}
                 onChangeColor={(color) => [].includes(color)}
                 sx={{ maxWidth: 38 * 4 }}
               />
@@ -248,7 +190,13 @@ const handleClearAll = ()=>{
               </Typography>
               <RadioGroup>
                 {FILTER_PRICE_OPTIONS.map((item) => (
-                  <FormControlLabel key={item.value} value={item.value} onClick={()=>handleFilterPrice(item)}  control={<Radio />} label={item.label} />
+                  <FormControlLabel
+                    key={item.value}
+                    value={item.value}
+                    onClick={() => handleFilterPrice(item)}
+                    control={<Radio />}
+                    label={item.label}
+                  />
                 ))}
               </RadioGroup>
             </div>
@@ -293,7 +241,7 @@ const handleClearAll = ()=>{
             type="submit"
             color="inherit"
             variant="outlined"
-            onClick={()=>handleClearAll()}
+            onClick={() => handleClearAll()}
             startIcon={<Iconify icon="ic:round-clear-all" />}
           >
             Clear All

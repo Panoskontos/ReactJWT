@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 // @mui
@@ -38,30 +38,9 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 
 // ----------------------------------------------------------------------
 
-const USERLIST = [
-  {
-    id: 'id1',
-    avatarUrl: `/assets/images/products/product_1.jpg`,
-    name: 'M4',
-    months: '3 months',
-    brand: 'BMW',
-    price: '100$',
-    status: 'sale',
-  },
-  {
-    id: 'id2',
-    avatarUrl: `/assets/images/products/product_2.jpg`,
-    name: 'TTS',
-    months: '3 months',
-    brand: 'AUDI',
-    price: '300$',
-    status: 'sale',
-  },
-];
-
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'months', label: 'Months', alignRight: false },
+  { id: 'seats', label: 'Seats', alignRight: false },
   { id: 'price', label: 'Price', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
   { id: 'brand', label: 'Brand', alignRight: false },
@@ -94,7 +73,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.model.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -112,6 +91,29 @@ const style = {
 };
 
 export default function UserPage() {
+  const [USERLIST, setUSERLIST] = useState([]);
+
+  // const USERLIST = [
+  //   {
+  //     id: 'id1',
+  //     avatarUrl: `/assets/images/products/product_1.jpg`,
+  //     name: 'M4',
+  //     months: '3 months',
+  //     brand: 'BMW',
+  //     price: '100$',
+  //     status: 'sale',
+  //   },
+  //   {
+  //     id: 'id2',
+  //     avatarUrl: `/assets/images/products/product_2.jpg`,
+  //     name: 'TTS',
+  //     months: '3 months',
+  //     brand: 'AUDI',
+  //     price: '300$',
+  //     status: 'sale',
+  //   },
+  // ];
+
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -124,7 +126,7 @@ export default function UserPage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
 
   const [openAdd, setOpenAdd] = useState(false);
   const handleOpen = () => setOpenAdd(true);
@@ -152,7 +154,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = USERLIST.map((n) => n.model);
       setSelected(newSelecteds);
       return;
     }
@@ -197,6 +199,32 @@ export default function UserPage() {
   const numericPrice = parseFloat(price);
   const numericSeat = parseInt(seats, 10);
 
+  // Function to fetch data from the endpoint
+  const fetchData = async () => {
+    try {
+      // Get the token from localStorage
+      const userInfoString = localStorage.getItem('userInfo');
+      const userInfo = JSON.parse(userInfoString);
+      if (!userInfo || !userInfo.token) {
+        console.error('Invalid user info or missing token');
+        return;
+      }
+      const token = userInfo.token;
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const response = await axios.get('https://localhost:7104/api/car/all', { headers });
+      setUSERLIST(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handleSave = () => {
     // Prepare the data object to be sent in the POST request
     const data = {
@@ -230,6 +258,7 @@ export default function UserPage() {
       .then((response) => {
         // Handle the response if needed (e.g., show a success message)
         console.log('Data saved successfully:', response.data);
+        fetchData();
       })
       .catch((error) => {
         // Handle any errors that occurred during the POST request
@@ -267,6 +296,7 @@ export default function UserPage() {
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', mt: 3 }}>
               <TextField
+                style={{ marginTop: '10px' }}
                 id="outlined-basic"
                 label="Brand"
                 variant="outlined"
@@ -274,6 +304,7 @@ export default function UserPage() {
                 onChange={(e) => setBrand(e.target.value)}
               />
               <TextField
+                style={{ marginTop: '10px' }}
                 id="outlined-basic"
                 label="Model"
                 variant="outlined"
@@ -281,6 +312,7 @@ export default function UserPage() {
                 onChange={(e) => setModel(e.target.value)}
               />
               <TextField
+                style={{ marginTop: '10px' }}
                 id="outlined-basic"
                 label="Price"
                 variant="outlined"
@@ -289,6 +321,7 @@ export default function UserPage() {
                 onChange={(e) => setPrice(e.target.value)}
               />
               <TextField
+                style={{ marginTop: '10px' }}
                 id="outlined-basic"
                 label="Seats"
                 variant="outlined"
@@ -297,6 +330,7 @@ export default function UserPage() {
                 onChange={(e) => setSeats(e.target.value)}
               />
               <TextField
+                style={{ marginTop: '10px' }}
                 id="outlined-basic"
                 label="Image"
                 variant="outlined"
@@ -335,30 +369,30 @@ export default function UserPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, brand, status, months, avatarUrl, price } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
+                    const { id, model, brand, status, seats, image, price } = row;
+                    const selectedUser = selected.indexOf(model) !== -1;
 
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, model)} />
                         </TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
+                            <Avatar alt={model} src={image} />
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {model}
                             </Typography>
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{months}</TableCell>
+                        <TableCell align="left">{seats}</TableCell>
 
                         <TableCell align="left">{price}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label>
+                          {/* <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
                         </TableCell>
                         <TableCell align="left">{brand}</TableCell>
 

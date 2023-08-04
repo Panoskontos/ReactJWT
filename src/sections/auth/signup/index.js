@@ -17,6 +17,8 @@ export default function SignUpForm() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState(1);
+  //
   const [showPassword, setShowPassword] = useState(false);
 
   const dispatch = useDispatch();
@@ -25,7 +27,7 @@ export default function SignUpForm() {
   const handleClick = async () => {
     console.log(email, password);
     try {
-      const res = await signup({ email, password, username }).unwrap();
+      const res = await signup({ email, password, username, role }).unwrap();
       navigate('/login');
     } catch (err) {
       toast.error(err?.data?.message || err.error);

@@ -2,6 +2,8 @@ import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState } from 'react';
+import axios from 'axios';
+
 // @mui
 import {
   Card,
@@ -20,7 +22,10 @@ import {
   Typography,
   IconButton,
   TableContainer,
+  Box,
   TablePagination,
+  Modal,
+  TextField,
 } from '@mui/material';
 // components
 import Label from '../components/label';
@@ -33,24 +38,25 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 
 // ----------------------------------------------------------------------
 
-const USERLIST = [{
-  id: "id1",
-  avatarUrl: `/assets/images/products/product_1.jpg`,
-  name: "M4",
-  months: "3 months",
-  brand:"BMW",
-  price: "100$",
-  status: "sale",
-},
-{
-  id: "id2",
-  avatarUrl: `/assets/images/products/product_2.jpg`,
-  name: "TTS",
-  months: "3 months",
-  brand:"AUDI",
-  price: "300$",
-  status: "sale",
-},
+const USERLIST = [
+  {
+    id: 'id1',
+    avatarUrl: `/assets/images/products/product_1.jpg`,
+    name: 'M4',
+    months: '3 months',
+    brand: 'BMW',
+    price: '100$',
+    status: 'sale',
+  },
+  {
+    id: 'id2',
+    avatarUrl: `/assets/images/products/product_2.jpg`,
+    name: 'TTS',
+    months: '3 months',
+    brand: 'AUDI',
+    price: '300$',
+    status: 'sale',
+  },
 ];
 
 const TABLE_HEAD = [
@@ -58,7 +64,7 @@ const TABLE_HEAD = [
   { id: 'months', label: 'Months', alignRight: false },
   { id: 'price', label: 'Price', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: 'brand', label:"Brand", alignRight: false },
+  { id: 'brand', label: 'Brand', alignRight: false },
   { id: 'role', label: 'Actions', alignRight: false },
 ];
 
@@ -93,6 +99,18 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+  borderRadius: '10px',
+};
+
 export default function UserPage() {
   const [open, setOpen] = useState(null);
 
@@ -107,6 +125,16 @@ export default function UserPage() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [openAdd, setOpenAdd] = useState(false);
+  const handleOpen = () => setOpenAdd(true);
+  const handleClose = () => setOpenAdd(false);
+
+  const [brand, setBrand] = useState('');
+  const [model, setModel] = useState('');
+  const [price, setPrice] = useState(0);
+  const [seats, setSeats] = useState(4);
+  const [image, setImage] = useState('');
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -166,6 +194,49 @@ export default function UserPage() {
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
+  const numericPrice = parseFloat(price);
+  const numericSeat = parseInt(seats, 10);
+
+  const handleSave = () => {
+    // Prepare the data object to be sent in the POST request
+    const data = {
+      brand,
+      model,
+      price: numericPrice,
+      image,
+      seats: numericSeat,
+    };
+
+    // Get the token from localStorage
+    const userInfoString = localStorage.getItem('userInfo');
+    // Parse the userInfo object
+    const userInfo = JSON.parse(userInfoString);
+    if (!userInfo || !userInfo.token) {
+      console.error('Invalid user info or missing token');
+      return;
+    }
+
+    // Get the token from the userInfo object
+    const token = userInfo.token;
+
+    // Include the token in the headers of the request
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // Make the POST request using axios
+    axios
+      .post('https://localhost:7104/api/car', data, { headers })
+      .then((response) => {
+        // Handle the response if needed (e.g., show a success message)
+        console.log('Data saved successfully:', response.data);
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the POST request
+        console.error('Error saving data:', error);
+      });
+  };
+
   return (
     <>
       <Helmet>
@@ -177,10 +248,75 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Cars Collection
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button onClick={handleOpen} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
             New Car
           </Button>
         </Stack>
+
+        <Modal
+          open={openAdd}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Add new Car
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', mt: 3 }}>
+              <TextField
+                id="outlined-basic"
+                label="Brand"
+                variant="outlined"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Model"
+                variant="outlined"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Price"
+                variant="outlined"
+                value={price}
+                type="number"
+                onChange={(e) => setPrice(e.target.value)}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Seats"
+                variant="outlined"
+                value={seats}
+                type="number"
+                onChange={(e) => setSeats(e.target.value)}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Image"
+                variant="outlined"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              <Button
+                onClick={() => {
+                  handleSave();
+                }}
+                variant="contained"
+                color="info"
+              >
+                Save
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
 
         <Card>
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
@@ -218,7 +354,6 @@ export default function UserPage() {
                         </TableCell>
 
                         <TableCell align="left">{months}</TableCell>
-
 
                         <TableCell align="left">{price}</TableCell>
 

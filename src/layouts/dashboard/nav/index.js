@@ -95,7 +95,7 @@ export default function Nav({ openNav, onCloseNav }) {
     // },
   ];
 
-  if (userInfo?.role === 'admin') {
+  if (userInfo?.role === 3) {
     navConfig.push({
       title: 'Admin',
       path: '/dashboard/user',
@@ -188,11 +188,11 @@ export default function Nav({ openNav, onCloseNav }) {
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {userInfo ? userInfo.email : 'none'}
+                {userInfo ? userInfo.username : 'none'}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {userInfo ? userInfo.role : 'none'}
+                {userInfo.role === 3 ? 'admin' : 'none'}
               </Typography>
             </Box>
           </StyledAccount>

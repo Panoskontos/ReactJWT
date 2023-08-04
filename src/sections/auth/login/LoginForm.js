@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 // import { useEffect } from 'react';
 
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useNavigate } from 'react-router-dom';
 // @mui
 import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 import Iconify from '../../../components/iconify';
 import { useLoginMutation } from '../../../slices/userApiSlice';
 import { setCredentials } from '../../../slices/authSlice';
@@ -17,32 +17,30 @@ import { setCredentials } from '../../../slices/authSlice';
 export default function LoginForm() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('')
-  const dispatch = useDispatch()
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
 
+  const [login, { isLoading }] = useLoginMutation();
 
-  const [login, {isLoading}] = useLoginMutation();
+  // useEffect(()=>{
+  //   if(userInfo){
+  //     navigate('/')
+  //   }
+  // }, [navigate, userInfo])
 
-// useEffect(()=>{
-//   if(userInfo){
-//     navigate('/')
-//   }
-// }, [navigate, userInfo])
-
-  const { userInfo } = useSelector((state)=>state.auth)
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClick = async () => {
-    console.log(email, password)
-    try{
-      const res = await login({email, password}).unwrap();
-      dispatch(setCredentials({...res}))
-      navigate("/")
-
+    console.log(username, password);
+    try {
+      const res = await login({ username, password }).unwrap();
+      dispatch(setCredentials({ ...res }));
+      navigate('/');
     } catch (err) {
-      toast.error(err?.data?.message || err.error)
+      toast.error(err?.data?.message || err.error);
     }
     // navigate('/dashboard', { replace: true });
   };
@@ -50,17 +48,13 @@ export default function LoginForm() {
   return (
     <>
       <Stack spacing={3}>
-        <TextField 
-        name="email" 
-        value={email} 
-        onChange={(e)=>setEmail(e.target.value)}
-        label="Email address" />
+        <TextField name="username" value={username} onChange={(e) => setUsername(e.target.value)} label="Username" />
 
         <TextField
           name="password"
           label="Password"
           value={password}
-        onChange={(e)=>setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           type={showPassword ? 'text' : 'password'}
           InputProps={{
             endAdornment: (

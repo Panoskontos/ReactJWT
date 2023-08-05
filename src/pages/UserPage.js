@@ -131,6 +131,7 @@ export default function UserPage() {
   const [rowsPerPage, setRowsPerPage] = useState(15);
 
   const [openAdd, setOpenAdd] = useState(false);
+
   const handleOpen = () => setOpenAdd(true);
   const handleClose = () => setOpenAdd(false);
 
@@ -142,7 +143,18 @@ export default function UserPage() {
   const [status, setStatus] = useState('');
   const [color, setColor] = useState('');
 
-  const handleOpenMenu = (event, carId) => {
+  handleAddOpen = () => {
+    handleAddOpen();
+    setBrand('');
+    setModel('');
+    setPrice(0);
+    setSeats(4);
+    setImage('');
+    setStatus('');
+    setColor('');
+  };
+
+  const handleOpenMenu = (event, carId, model, brand, status, seats, image, price) => {
     setOpen(event.currentTarget);
     setSelectedForAction(carId);
   };
@@ -301,6 +313,8 @@ export default function UserPage() {
       });
   };
 
+  const handleEdit = () => {};
+
   return (
     <>
       <Helmet>
@@ -446,7 +460,11 @@ export default function UserPage() {
                         <TableCell align="left">{brand}</TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, carId)}>
+                          <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={(e) => handleOpenMenu(e, carId, model, brand, status, seats, image, price)}
+                          >
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -518,7 +536,13 @@ export default function UserPage() {
         }}
       >
         <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+          <Iconify
+            onClick={() => {
+              handleEdit();
+            }}
+            icon={'eva:edit-fill'}
+            sx={{ mr: 2 }}
+          />
           Edit
         </MenuItem>
 

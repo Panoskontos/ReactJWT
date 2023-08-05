@@ -60,7 +60,7 @@ export default function ShopFilterSidebar({ openFilter, onOpenFilter, onCloseFil
   const handleFilterColor = (item) => {
     // console.log(item.target.value)
     const color = item.target.value;
-    const filteredProducts = products.filter((product) => product.color.toLowerCase().includes(color.toLowerCase()));
+    const filteredProducts = products.filter((product) => product?.color?.toLowerCase().includes(color.toLowerCase()));
     setProducts(filteredProducts);
   };
 

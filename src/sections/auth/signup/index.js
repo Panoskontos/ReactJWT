@@ -17,7 +17,7 @@ export default function SignUpForm() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState(1);
+  const [role, setRole] = useState(2);
   //
   const [showPassword, setShowPassword] = useState(false);
 

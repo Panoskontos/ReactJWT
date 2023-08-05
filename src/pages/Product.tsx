@@ -30,22 +30,55 @@ const style = {
   p: 4,
 };
 
+function getFifthOfEachMonth(monthArray: any) {
+  const fifthDates: any = [];
+  monthArray.forEach((monthString: any) => {
+    const [year, month] = monthString.split('-');
+    const utcDate = new Date(Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, 5)); // Provide radix 10 for decimal numbers
+    fifthDates.push(utcDate);
+  });
+  return fifthDates;
+}
+
+function getMonthsBetweenDates(startDate: any, endDate: any) {
+  const months = [];
+  const currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    const year = currentDate.getUTCFullYear();
+    const month = currentDate.getUTCMonth() + 1; // Add 1 because months are zero-indexed
+    const formattedMonth = `${year}-${month.toString().padStart(2, '0')}`;
+    months.push(formattedMonth);
+    // Move to the next month
+    currentDate.setUTCMonth(currentDate.getUTCMonth() + 1);
+  }
+  console.log(getFifthOfEachMonth(months));
+  return getFifthOfEachMonth(months);
+}
+
 const Product: React.FC = () => {
   const location = useLocation();
 
   const [myproduct, setMyproduct] = useState('');
+  const [rent, setRent] = useState('');
+  const [bannedMonths, setBannedMonths] = useState<Date[] | null>(null);
 
   const { i, n, b, p, c, s } = location.state;
 
-  const excludedDate1 = new Date(Date.UTC(2023, 8, 1));
-  const timestamp = excludedDate1.getTime();
-  const excludedDate2 = new Date(Date.UTC(2023, 9, 1));
-  const timestamp2 = excludedDate2.getTime();
+  function convertUnixTimestampToUTCDate(unixTimestamp: any) {
+    return new Date(unixTimestamp * 1000);
+  }
+
+  // 8 Aug
+  const excludedDate1 = convertUnixTimestampToUTCDate(1691442000);
+  console.log(excludedDate1);
+  // Nov 01
+  const excludedDate2 = convertUnixTimestampToUTCDate(1698789600);
+  console.log(excludedDate2);
 
   const [finalPrice, setFinalPrice] = useState(0);
   const [finalBookedMonths, setFinalBookedMonths] = useState(0);
 
-  const [excludedArray, setExcludedArray] = useState([excludedDate1, excludedDate2]);
+  const [excludedArray, setExcludedArray] = useState(getMonthsBetweenDates(excludedDate1, excludedDate2));
 
   function calculateMonthsBetween(date1: any, date2: any) {
     // Ensure date1 is before date2
@@ -90,11 +123,62 @@ const Product: React.FC = () => {
     return firstDays;
   }
 
+  function convertUTCDateToUnixTimestamp(utcDate: any) {
+    console.log(utcDate);
+    return Math.floor(utcDate.getTime() / 1000);
+  }
+
   const handlePayNow = () => {
-    toast.success(`You have successfully booked ${n} for ${finalBookedMonths} months !`, {
-      position: toast.POSITION.TOP_CENTER,
-    });
-    setFinalBookedMonths(0);
+    const unixTimestampStart: any = convertUTCDateToUnixTimestamp(startDate);
+    const unixTimestampEnd: any = convertUTCDateToUnixTimestamp(endDate);
+
+    const data = {
+      carId: i,
+      dateFrom: unixTimestampStart,
+      dateTo: unixTimestampEnd,
+    };
+
+    // Get the token from localStorage
+    const userInfoString = localStorage.getItem('userInfo');
+    if (!userInfoString) {
+      console.error('User info not found in localStorage');
+      return;
+    }
+    // Parse the userInfo object
+    const userInfo = JSON.parse(userInfoString);
+    if (!userInfo || !userInfo.token) {
+      console.error('Invalid user info or missing token');
+      return;
+    }
+
+    // Get the token from the userInfo object
+    const token = userInfo.token;
+
+    // Include the token in the headers of the request
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // Make the POST request using axios
+    axios
+      .post('https://localhost:7104/api/rent', data, { headers })
+      .then((response) => {
+        // Handle the response if needed (e.g., show a success message)
+        toast.success(`You have successfully booked ${n} for ${finalBookedMonths} months !`, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        setFinalBookedMonths(0);
+        // concat excluded dates
+        const concatenatedArray: any[] = excludedArray.concat(bannedMonths);
+
+        setExcludedArray(concatenatedArray);
+        console.log(concatenatedArray);
+        console.log('Data saved successfully:', response.data);
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the POST request
+        console.error('Error saving data:', error);
+      });
   };
 
   const [open, setOpen] = useState(false);
@@ -120,16 +204,16 @@ const Product: React.FC = () => {
     console.log(firstDays);
 
     let bmonths;
-    if (months === 0) {
+    if (months === 0 || months === 1) {
       console.log(1);
       bmonths = 1;
     } else {
-      console.log(months + 1 - excludedArray.length);
-      bmonths = months + 2 - excludedArray.length;
+      bmonths = months;
     }
 
     setFinalBookedMonths(bmonths);
-    setExcludedArray(firstDays);
+
+    setBannedMonths(firstDays);
   };
 
   // Function to fetch data from the endpoint
@@ -160,8 +244,36 @@ const Product: React.FC = () => {
     }
   };
 
+  const fecthRentData = async () => {
+    try {
+      // Get the token from localStorage
+      const userInfoString = localStorage.getItem('userInfo');
+      if (!userInfoString) {
+        console.error('User info not found in localStorage');
+        return;
+      }
+      const userInfo = JSON.parse(userInfoString);
+      if (!userInfo || !userInfo.token) {
+        console.error('Invalid user info or missing token');
+        return;
+      }
+      const token = userInfo.token;
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const link = `https://localhost:7104/api/rent/${i}`;
+
+      const response = await axios.get(link, { headers });
+      setRent(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fecthRentData();
   }, []);
 
   return (

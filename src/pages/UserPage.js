@@ -137,6 +137,8 @@ export default function UserPage() {
   const [price, setPrice] = useState(0);
   const [seats, setSeats] = useState(4);
   const [image, setImage] = useState('');
+  const [status, setStatus] = useState('');
+  const [color, setColor] = useState('');
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -232,6 +234,8 @@ export default function UserPage() {
       model,
       price: numericPrice,
       image,
+      status,
+      color,
       seats: numericSeat,
     };
 
@@ -337,6 +341,22 @@ export default function UserPage() {
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
               />
+              <TextField
+                style={{ marginTop: '10px' }}
+                id="outlined-basic"
+                label="Color"
+                variant="outlined"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+              />
+              <TextField
+                style={{ marginTop: '10px' }}
+                id="outlined-basic"
+                label="Status"
+                variant="outlined"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+              />
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
               <Button
@@ -391,9 +411,7 @@ export default function UserPage() {
 
                         <TableCell align="left">{price}</TableCell>
 
-                        <TableCell align="left">
-                          {/* <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
-                        </TableCell>
+                        <TableCell align="left">{status}</TableCell>
                         <TableCell align="left">{brand}</TableCell>
 
                         <TableCell align="right">

@@ -122,6 +122,8 @@ export default function UserPage() {
 
   const [selected, setSelected] = useState([]);
 
+  const [selectedForAction, setSelectedForAction] = useState('');
+
   const [orderBy, setOrderBy] = useState('name');
 
   const [filterName, setFilterName] = useState('');
@@ -140,8 +142,9 @@ export default function UserPage() {
   const [status, setStatus] = useState('');
   const [color, setColor] = useState('');
 
-  const handleOpenMenu = (event) => {
+  const handleOpenMenu = (event, carId) => {
     setOpen(event.currentTarget);
+    setSelectedForAction(carId);
   };
 
   const handleCloseMenu = () => {
@@ -270,6 +273,34 @@ export default function UserPage() {
       });
   };
 
+  const handleDelete = () => {
+    console.log(selectedForAction);
+    const userInfoString = localStorage.getItem('userInfo');
+
+    const userInfo = JSON.parse(userInfoString);
+    if (!userInfo || !userInfo.token) {
+      console.error('Invalid user info or missing token');
+      return;
+    }
+    const token = userInfo.token;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // Make the DELETE request using axios
+    axios
+      .delete(`https://localhost:7104/api/car/${selectedForAction}`, { headers })
+      .then((response) => {
+        // Handle the response if needed (e.g., show a success message)
+        console.log('Data deleted successfully:', response.data);
+        fetchData(); // Assuming you want to fetch data after deletion
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the DELETE request
+        console.error('Error deleting data:', error);
+      });
+  };
+
   return (
     <>
       <Helmet>
@@ -389,11 +420,11 @@ export default function UserPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, model, brand, status, seats, image, price } = row;
+                    const { carId, model, brand, status, seats, image, price } = row;
                     const selectedUser = selected.indexOf(model) !== -1;
 
                     return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={carId} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
                           <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, model)} />
                         </TableCell>
@@ -415,7 +446,7 @@ export default function UserPage() {
                         <TableCell align="left">{brand}</TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, carId)}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -491,7 +522,12 @@ export default function UserPage() {
           Edit
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        <MenuItem
+          onClick={() => {
+            handleDelete();
+          }}
+          sx={{ color: 'error.main' }}
+        >
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>

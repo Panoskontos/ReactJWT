@@ -83,6 +83,11 @@ export default function Nav({ openNav, onCloseNav }) {
       path: '/dashboard/cars',
       icon: icon('ic_cart'),
     },
+    {
+      title: 'Reccomendation',
+      path: '/dashboard/reccomendations',
+      icon: icon('ic_blog'),
+    },
     // {
     //   title: 'blog',
     //   path: '/dashboard/blog',

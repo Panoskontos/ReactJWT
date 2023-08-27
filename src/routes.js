@@ -11,9 +11,10 @@ import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import SignUpPage from './pages/SignUpPage';
 import PrivateRoute from './privateRoute';
-import Product from './pages/Product.tsx'
+import Product from './pages/Product.tsx';
+import ReccomendationPage from './pages/ReccomendationPage';
 
-// ------------------------------------------- 
+// -------------------------------------------
 export default function Router() {
   const routes = useRoutes([
     {
@@ -21,37 +22,61 @@ export default function Router() {
       element: <DashboardLayout />,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element:<PrivateRoute><DashboardAppPage /></PrivateRoute>  
-           },
-        { path: 'user', element: 
-        <PrivateRoute>
-          <UserPage />
-        </PrivateRoute>
-       },
-        { path: 'cars', element:
-        <PrivateRoute>    
-          <ProductsPage />
-        </PrivateRoute>
-       },
-        { 
+        {
+          path: 'app',
+          element: (
+            <PrivateRoute>
+              <DashboardAppPage />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: 'user',
+          element: (
+            <PrivateRoute>
+              <UserPage />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: 'cars',
+          element: (
+            <PrivateRoute>
+              <ProductsPage />
+            </PrivateRoute>
+          ),
+        },
+        {
           path: 'car',
-         element:
-        <PrivateRoute>    
-          <Product />
-        </PrivateRoute>
-       },
-        { path: 'blog', element:
-      <PrivateRoute>
-        <BlogPage />
-      </PrivateRoute>  
-       },
+          element: (
+            <PrivateRoute>
+              <Product />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: 'reccomendations',
+          element: (
+            <PrivateRoute>
+              <ReccomendationPage />
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: 'blog',
+          element: (
+            <PrivateRoute>
+              <BlogPage />
+            </PrivateRoute>
+          ),
+        },
       ],
     },
     {
       path: 'login',
       element: <LoginPage />,
     },
-       {
+    {
       path: 'signup',
       element: <SignUpPage />,
     },

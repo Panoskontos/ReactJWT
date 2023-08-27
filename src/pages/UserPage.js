@@ -93,26 +93,18 @@ const style = {
 export default function UserPage() {
   const [USERLIST, setUSERLIST] = useState([]);
 
-  // const USERLIST = [
-  //   {
-  //     id: 'id1',
-  //     avatarUrl: `/assets/images/products/product_1.jpg`,
-  //     name: 'M4',
-  //     months: '3 months',
-  //     brand: 'BMW',
-  //     price: '100$',
-  //     status: 'sale',
-  //   },
-  //   {
-  //     id: 'id2',
-  //     avatarUrl: `/assets/images/products/product_2.jpg`,
-  //     name: 'TTS',
-  //     months: '3 months',
-  //     brand: 'AUDI',
-  //     price: '300$',
-  //     status: 'sale',
-  //   },
-  // ];
+  const [file, setFile] = useState();
+  const [realFile, setRealFile] = useState();
+
+  const [imageDataList, setImageDataList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  function handleChange(e) {
+    console.log(e.target.files);
+
+    setFile(URL.createObjectURL(e.target.files[0]));
+    setRealFile(e.target.files[0]);
+  }
 
   const [open, setOpen] = useState(null);
 
@@ -121,6 +113,7 @@ export default function UserPage() {
   const [order, setOrder] = useState('asc');
 
   const [selected, setSelected] = useState([]);
+  const [EditMode, setEditMode] = useState(false);
 
   const [selectedForAction, setSelectedForAction] = useState('');
 
@@ -143,8 +136,9 @@ export default function UserPage() {
   const [status, setStatus] = useState('');
   const [color, setColor] = useState('');
 
-  handleAddOpen = () => {
-    handleAddOpen();
+  const handleAddOpen = () => {
+    setEditMode(false);
+    handleOpen();
     setBrand('');
     setModel('');
     setPrice(0);
@@ -154,9 +148,21 @@ export default function UserPage() {
     setColor('');
   };
 
-  const handleOpenMenu = (event, carId, model, brand, status, seats, image, price) => {
+  const handleEditOpen = () => {
+    setEditMode(true);
+    handleOpen();
+  };
+
+  const handleOpenMenu = (event, carId, model, brand, status, seats, image, price, color) => {
     setOpen(event.currentTarget);
     setSelectedForAction(carId);
+    setBrand(brand);
+    setModel(model);
+    setPrice(price);
+    setSeats(seats);
+    setImage(image);
+    setStatus(status);
+    setColor(color);
   };
 
   const handleCloseMenu = () => {
@@ -227,12 +233,40 @@ export default function UserPage() {
         return;
       }
       const token = userInfo.token;
+      const vallet = userInfo.valetKey;
+
       const headers = {
         Authorization: `Bearer ${token}`,
       };
+      const headers2 = {
+        Authorization: `Bearer ${vallet}`,
+      };
+
+      const idtoImage = {};
 
       const response = await axios.get('https://localhost:7104/api/car/all', { headers });
-      setUSERLIST(response.data);
+
+      const cars = await Promise.all(
+        response.data.map(async (car) => {
+          try {
+            const imageResponse = await axios.get(`https://localhost:5401/api/file/${car.carId}`, {
+              headers: headers2,
+              responseType: 'blob',
+            });
+
+            const imageUrl = URL.createObjectURL(imageResponse.data);
+            car.image = imageUrl;
+
+            return car;
+          } catch (error) {
+            console.error(`Error fetching image data for car with ID ${car.carId}:`, error);
+            return null;
+          }
+        })
+      );
+      console.log(cars);
+
+      setUSERLIST(cars);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -244,15 +278,28 @@ export default function UserPage() {
 
   const handleSave = () => {
     // Prepare the data object to be sent in the POST request
-    const data = {
-      brand,
-      model,
-      price: numericPrice,
-      image,
-      status,
-      color,
-      seats: numericSeat,
-    };
+    // const data = {
+    //   brand,
+    //   model,
+    //   price: numericPrice,
+    //   image: file,
+    //   status,
+    //   color,
+    //   seats: numericSeat,
+    // };
+
+    const formData = new FormData();
+
+    formData.append('brand', brand);
+    formData.append('model', model);
+    formData.append('price', numericPrice);
+    formData.append('image', realFile); // Append the image file here
+    formData.append('status', status);
+    formData.append('color', color);
+    formData.append('seats', numericSeat);
+
+    const formData2 = new FormData();
+    formData2.append('Image', realFile);
 
     // Get the token from localStorage
     const userInfoString = localStorage.getItem('userInfo');
@@ -273,11 +320,76 @@ export default function UserPage() {
 
     // Make the POST request using axios
     axios
-      .post('https://localhost:7104/api/car', data, { headers })
+      .post('https://localhost:7104/api/car', formData, { headers })
+      .then((response) => {
+        const valletUpload = response.data.valetKey;
+
+        const headers2 = {
+          Authorization: `Bearer ${valletUpload}`,
+        };
+
+        axios
+          .post('https://localhost:5401/api/file', formData2, { headers: headers2 }) // Use headers instead of headers2
+          .then((response) => {
+            console.log('Data saved successfully:', response.data);
+            fetchData();
+          })
+          .catch((error) => {
+            console.error('Error saving data:', error);
+          });
+      })
+      .catch((error) => {
+        console.error('Error saving data:', error);
+      });
+  };
+
+  const handleEdit = () => {
+    // Prepare the data object to be sent in the POST request
+    // const data = {
+    //   brand,
+    //   model,
+    //   price: numericPrice,
+    //   image: file,
+    //   status,
+    //   color,
+    //   seats: numericSeat,
+    // };
+
+    const formData = new FormData();
+
+    formData.append('brand', brand);
+    formData.append('model', model);
+    formData.append('price', numericPrice);
+    formData.append('image', realFile); // Append the image file here
+    formData.append('status', status);
+    formData.append('color', color);
+    formData.append('seats', numericSeat);
+
+    // Get the token from localStorage
+    const userInfoString = localStorage.getItem('userInfo');
+    // Parse the userInfo object
+    const userInfo = JSON.parse(userInfoString);
+    if (!userInfo || !userInfo.token) {
+      console.error('Invalid user info or missing token');
+      return;
+    }
+
+    // Get the token from the userInfo object
+    const token = userInfo.token;
+
+    // Include the token in the headers of the request
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // Make the POST request using axios
+    axios
+      .patch(`https://localhost:7104/api/car/${selectedForAction}`, formData, { headers })
       .then((response) => {
         // Handle the response if needed (e.g., show a success message)
         console.log('Data saved successfully:', response.data);
         fetchData();
+        handleClose();
       })
       .catch((error) => {
         // Handle any errors that occurred during the POST request
@@ -299,21 +411,26 @@ export default function UserPage() {
       Authorization: `Bearer ${token}`,
     };
 
-    // Make the DELETE request using axios
-    axios
-      .delete(`https://localhost:7104/api/car/${selectedForAction}`, { headers })
-      .then((response) => {
-        // Handle the response if needed (e.g., show a success message)
-        console.log('Data deleted successfully:', response.data);
-        fetchData(); // Assuming you want to fetch data after deletion
-      })
-      .catch((error) => {
-        // Handle any errors that occurred during the DELETE request
-        console.error('Error deleting data:', error);
-      });
-  };
+    // Show a confirm dialog to get user confirmation
+    const confirmDelete = window.confirm('Are you sure you want to delete this item?');
 
-  const handleEdit = () => {};
+    if (confirmDelete) {
+      // Make the DELETE request using axios
+      axios
+        .delete(`https://localhost:7104/api/car/${selectedForAction}`, { headers })
+        .then((response) => {
+          // Handle the response if needed (e.g., show a success message)
+          console.log('Data deleted successfully:', response.data);
+          fetchData(); // Assuming you want to fetch data after deletion
+        })
+        .catch((error) => {
+          // Handle any errors that occurred during the DELETE request
+          console.error('Error deleting data:', error);
+        });
+    } else {
+      console.log('Deletion cancelled by the user.');
+    }
+  };
 
   return (
     <>
@@ -326,7 +443,7 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Cars Collection
           </Typography>
-          <Button onClick={handleOpen} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button onClick={handleAddOpen} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
             New Car
           </Button>
         </Stack>
@@ -378,14 +495,11 @@ export default function UserPage() {
                 type="number"
                 onChange={(e) => setSeats(e.target.value)}
               />
-              <TextField
-                style={{ marginTop: '10px' }}
-                id="outlined-basic"
-                label="Image"
-                variant="outlined"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-              />
+              <Box style={{ marginTop: '10px' }}>
+                <input type="file" onChange={handleChange} />
+                {file && <img src={file} alt="Uploaded Content" />}
+              </Box>
+
               <TextField
                 style={{ marginTop: '10px' }}
                 id="outlined-basic"
@@ -404,15 +518,27 @@ export default function UserPage() {
               />
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-              <Button
-                onClick={() => {
-                  handleSave();
-                }}
-                variant="contained"
-                color="info"
-              >
-                Save
-              </Button>
+              {EditMode ? (
+                <Button
+                  onClick={() => {
+                    handleEdit();
+                  }}
+                  variant="contained"
+                  color="info"
+                >
+                  Update
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    handleSave();
+                  }}
+                  variant="contained"
+                  color="info"
+                >
+                  Save
+                </Button>
+              )}
             </Box>
           </Box>
         </Modal>
@@ -434,7 +560,7 @@ export default function UserPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { carId, model, brand, status, seats, image, price } = row;
+                    const { carId, model, brand, status, seats, image, price, color } = row;
                     const selectedUser = selected.indexOf(model) !== -1;
 
                     return (
@@ -463,7 +589,7 @@ export default function UserPage() {
                           <IconButton
                             size="large"
                             color="inherit"
-                            onClick={(e) => handleOpenMenu(e, carId, model, brand, status, seats, image, price)}
+                            onClick={(e) => handleOpenMenu(e, carId, model, brand, status, seats, image, price, color)}
                           >
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
@@ -535,14 +661,12 @@ export default function UserPage() {
           },
         }}
       >
-        <MenuItem>
-          <Iconify
-            onClick={() => {
-              handleEdit();
-            }}
-            icon={'eva:edit-fill'}
-            sx={{ mr: 2 }}
-          />
+        <MenuItem
+          onClick={() => {
+            handleEditOpen();
+          }}
+        >
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
 

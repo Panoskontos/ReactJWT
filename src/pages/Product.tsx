@@ -55,6 +55,21 @@ function getMonthsBetweenDates(startDate: any, endDate: any) {
   return getFifthOfEachMonth(months);
 }
 
+function convertDateFormatForArray(dateArray: any) {
+  const convertedDates = [];
+
+  dateArray.forEach((dateStr) => {
+    const inputDate = new Date(dateStr);
+
+    // Check if the inputDate is a valid date using Number.isNaN
+    if (!Number.isNaN(inputDate.getTime())) {
+      convertedDates.push(inputDate);
+    }
+  });
+
+  return convertedDates;
+}
+
 const Product: React.FC = () => {
   const location = useLocation();
 
@@ -78,7 +93,8 @@ const Product: React.FC = () => {
   const [finalPrice, setFinalPrice] = useState(0);
   const [finalBookedMonths, setFinalBookedMonths] = useState(0);
 
-  const [excludedArray, setExcludedArray] = useState(getMonthsBetweenDates(excludedDate1, excludedDate2));
+  // const [excludedArray, setExcludedArray] = useState(getMonthsBetweenDates(excludedDate1, excludedDate2));
+  const [excludedArray, setExcludedArray] = useState([]);
 
   function calculateMonthsBetween(date1: any, date2: any) {
     // Ensure date1 is before date2
@@ -132,10 +148,13 @@ const Product: React.FC = () => {
     const unixTimestampStart: any = convertUTCDateToUnixTimestamp(startDate);
     const unixTimestampEnd: any = convertUTCDateToUnixTimestamp(endDate);
 
+    const value = p * finalBookedMonths;
+
     const data = {
       carId: i,
       dateFrom: unixTimestampStart,
       dateTo: unixTimestampEnd,
+      value,
     };
 
     // Get the token from localStorage
@@ -239,6 +258,11 @@ const Product: React.FC = () => {
 
       const response = await axios.get(link, { headers });
       setMyproduct(response.data);
+      // setExcludedArray(response.data.excludedMonths);
+
+      const newArray = convertDateFormatForArray(response.data.excludedMonths);
+      console.log(newArray);
+      setExcludedArray(newArray);
     } catch (error) {
       console.error('Error fetching data:', error);
     }

@@ -31,8 +31,8 @@ import Scrollbar from '../../../components/scrollbar';
 const NOTIFICATIONS = [
   {
     id: faker.datatype.uuid(),
-    title: 'Your order is placed',
-    description: 'waiting for shipping',
+    title: 'Your booking is placed',
+    description: 'company will contact you',
     avatar: null,
     type: 'order_placed',
     createdAt: set(new Date(), { hours: 10, minutes: 30 }),
@@ -40,44 +40,26 @@ const NOTIFICATIONS = [
   },
   {
     id: faker.datatype.uuid(),
-    title: faker.name.fullName(),
-    description: 'answered to your comment on the Minimal',
+    description: 'your last booking just ended',
     avatar: '/assets/images/avatars/avatar_2.jpg',
     type: 'friend_interactive',
     createdAt: sub(new Date(), { hours: 3, minutes: 30 }),
     isUnRead: true,
   },
-  {
-    id: faker.datatype.uuid(),
-    title: 'You have new message',
-    description: '5 unread messages',
-    avatar: null,
-    type: 'chat_message',
-    createdAt: sub(new Date(), { days: 1, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'You have new mail',
-    description: 'sent from Guido Padberg',
-    avatar: null,
-    type: 'mail',
-    createdAt: sub(new Date(), { days: 2, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'Delivery processing',
-    description: 'Your order is being shipped',
-    avatar: null,
-    type: 'order_shipped',
-    createdAt: sub(new Date(), { days: 3, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
 ];
 
 export default function NotificationsPopover() {
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
+
+  function markAllNotificationsAsRead(notifications) {
+    // Use map to create a new array with updated isUnRead property
+    const updatedNotifications = notifications.map((notification) => ({
+      ...notification,
+      isUnRead: false,
+    }));
+
+    return updatedNotifications;
+  }
 
   const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
 
@@ -85,6 +67,8 @@ export default function NotificationsPopover() {
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
+    const updatedNotifications = markAllNotificationsAsRead(NOTIFICATIONS);
+    setNotifications(updatedNotifications);
   };
 
   const handleClose = () => {
@@ -154,28 +138,9 @@ export default function NotificationsPopover() {
               <NotificationItem key={notification.id} notification={notification} />
             ))}
           </List>
-
-          <List
-            disablePadding
-            subheader={
-              <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
-                Before that
-              </ListSubheader>
-            }
-          >
-            {notifications.slice(2, 5).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
-          </List>
         </Scrollbar>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-
-        <Box sx={{ p: 1 }}>
-          <Button fullWidth disableRipple>
-            View All
-          </Button>
-        </Box>
       </Popover>
     </>
   );

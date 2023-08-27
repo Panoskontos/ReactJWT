@@ -100,7 +100,7 @@ const SORT_BY_OPTIONS = [
 
 export default function ProductsPage() {
   const [openFilter, setOpenFilter] = useState(false);
-  const [products, setProducts] = useState(productsDummy);
+  const [products, setProducts] = useState([]);
 
   const handleOpenFilter = () => {
     setOpenFilter(true);
@@ -114,6 +114,7 @@ export default function ProductsPage() {
   const fetchData = async () => {
     try {
       // Get the token from localStorage
+
       const userInfoString = localStorage.getItem('userInfo');
       if (!userInfoString) {
         console.error('User info not found in localStorage');
@@ -124,13 +125,41 @@ export default function ProductsPage() {
         console.error('Invalid user info or missing token');
         return;
       }
+      // const token = userInfo.token;
+
       const token = userInfo.token;
+      const vallet = userInfo.valetKey;
+
       const headers = {
         Authorization: `Bearer ${token}`,
       };
+      const headers2 = {
+        Authorization: `Bearer ${vallet}`,
+      };
 
       const response = await axios.get('https://localhost:7104/api/car/all', { headers });
-      setProducts(response.data);
+
+      const cars = await Promise.all(
+        response.data.map(async (car) => {
+          try {
+            const imageResponse = await axios.get(`https://localhost:5401/api/file/${car.carId}`, {
+              headers: headers2,
+              responseType: 'blob',
+            });
+
+            const imageUrl = URL.createObjectURL(imageResponse.data);
+            car.image = imageUrl;
+
+            return car;
+          } catch (error) {
+            console.error(`Error fetching image data for car with ID ${car.carId}:`, error);
+            return null;
+          }
+        })
+      );
+      console.log(cars);
+
+      setProducts(cars);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
